@@ -1,0 +1,172 @@
+﻿@using PersonsDirectoryApp.Data.Models
+@model PersonsDirectoryApp.Web.Models.PersonsSearchModel
+
+@{
+    ViewData["Title"] = "PersonFilter";
+}
+
+<h1>PersonFilter</h1>
+
+<h4>PersonsSearchModel</h4>
+<hr />
+<div class="row">
+    <div class="col-md-12">
+        <form asp-action="PersonFilter">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label asp-for="FirstName" class="control-label"></label>
+                    <input asp-for="FirstName" class="form-control" />
+                    <span asp-validation-for="FirstName" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="LastName" class="control-label"></label>
+                    <input asp-for="LastName" class="form-control" />
+                    <span asp-validation-for="LastName" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label asp-for="Gender" class="control-label"></label>
+                    <select asp-for="Gender" class="form-control" asp-items="Html.GetEnumSelectList<Enums.Gender>()">
+                        <option disabled selected>_Select_</option>
+                    </select>
+                    <span asp-validation-for="Gender" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="PersonalNo" class="control-label"></label>
+                    <input asp-for="PersonalNo" class="form-control" />
+                    <span asp-validation-for="PersonalNo" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label asp-for="BirthDate" class="control-label"></label>
+                    @Html.TextBoxFor(model => model.BirthDate, "{0:dd/MM/yyyy}", new { @class = "form-control datepicker", placeholder = "DD/MM/YYYY", maxlength = "100" })
+                    <span asp-validation-for="BirthDate" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="CityId" class="control-label"></label>
+                    <select asp-for="CityId" asp-items="ViewBag.Cities" class="form-control">
+                        <option disabled selected>_Select_</option>
+                    </select>
+                    <span asp-validation-for="CityId" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <input type="submit" value="Filter" class="btn btn-primary" />
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>
+                First Name
+            </th>
+            <th>
+                Last Name
+            </th>
+            <th>
+                Gender
+            </th>
+            <th>
+                Personal No
+            </th>
+            <th>
+                Birth Date
+            </th>
+            <th>
+                Age
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.PersonsList)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.FirstName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.LastName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Gender)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.PersonalNo)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.BirthDate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Age)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-light" target="_blank">Edit</a>
+                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info" target="_blank">Details</a>
+                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger" target="_blank">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@{
+    var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
+    var nextDisabled = !Model.HasNextPage ? "disabled" : "";
+}
+
+<div class="row">
+    <ul class="pagination">
+        <li>
+            <a asp-action="PersonFilter"
+               asp-route-PageIndex="@(Model.PageIndex - 1)"
+               asp-route-FirstName="@Model.FirstName"
+               asp-route-LastName="@Model.LastName"
+               asp-route-PersonalNo="@Model.PersonalNo"
+               asp-route-Gender="@Model.Gender"
+               asp-route-BirthDate="@Model.BirthDate"
+               asp-route-CityId="@Model.CityId"
+               asp-route-HasPhoto="@Model.HasPhoto"
+               class="btn btn-light @prevDisabled">
+                <<
+            </a>
+        </li>
+        @for (var i = 1; i <= Model.TotalPages; i++)
+        {
+            <li class="page-item @(i == Model.PageIndex ? "active" : "")">
+                <a asp-action="PersonFilter"
+                   asp-route-PageIndex="@i"
+                   asp-route-FirstName="@Model.FirstName"
+                   asp-route-LastName="@Model.LastName"
+                   asp-route-PersonalNo="@Model.PersonalNo"
+                   asp-route-Gender="@Model.Gender"
+                   asp-route-BirthDate="@Model.BirthDate"
+                   asp-route-CityId="@Model.CityId"
+                   asp-route-HasPhoto="@Model.HasPhoto"
+                   class="page-link">@i</a>
+            </li>
+        }
+        <li>
+            <a asp-action="PersonFilter"
+               asp-route-PageIndex="@(Model.PageIndex + 1)"
+               asp-route-FirstName="@Model.FirstName"
+               asp-route-LastName="@Model.LastName"
+               asp-route-PersonalNo="@Model.PersonalNo"
+               asp-route-Gender="@Model.Gender"
+               asp-route-BirthDate="@Model.BirthDate"
+               asp-route-CityId="@Model.CityId"
+               asp-route-HasPhoto="@Model.HasPhoto"
+               class="btn btn-light @nextDisabled">
+                >>
+            </a>
+        </li>
+    </ul>
+</div>

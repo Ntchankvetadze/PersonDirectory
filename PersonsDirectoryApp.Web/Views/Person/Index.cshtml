@@ -1,0 +1,119 @@
+﻿@model PaginatedList<PersonsDirectoryApp.Web.ViewModels.PersonViewModel>
+
+@{
+    ViewData["Title"] = "Index";
+
+}
+
+<h1>Persons List</h1>
+
+<p>
+    <a asp-action="Create"class="btn btn-success btn-lg">
+        <span class="glyphicon glyphicon-plus-sign"></span> Add
+    </a>
+</p>
+
+<form asp-action="Index" method="get">
+    <div class="form-actions no-color">
+        <div class="wrap">
+            <div class="search">
+                <input type="text" class="searchTerm" name="SearchString" value="@ViewData["currentFilter"]" placeholder="Multy search with First Name, Last Name and Personal No ...">
+                <button type="submit" class="searchButton">
+                    <i class="fa fa-search"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</form>
+
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>
+                First Name
+            </th>
+            <th>
+                Last Name
+            </th>
+            <th>
+                Gender
+            </th>
+            <th>
+                Personal No
+            </th>
+            <th>
+                Birth Date
+            </th>
+            <th>
+                Age
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.FirstName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.LastName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Gender)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.PersonalNo)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.BirthDate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Age)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-light" target="_blank">Edit</a> 
+                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info" target="_blank">Details</a> 
+                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger" target="_blank">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@{
+    var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
+    var nextDisabled = !Model.HasNextPage ? "disabled" : "";
+}
+
+<div class="row">
+    <ul class="pagination">
+        <li>
+            <a asp-action="Index"
+               asp-route-pageNumber="@(Model.PageIndex - 1)"
+               asp-route-currentFilter="@ViewData["CurrentFilter"]"
+               class="btn btn-light @prevDisabled">
+                <<
+            </a>
+        </li>
+        @for (var i = 1; i <= Model.TotalPages; i++)
+        {
+            <li class="page-item @(i == Model.PageIndex ? "active" : "")">
+                <a asp-action="Index"
+                   asp-route-pageNumber="@i"
+                   asp-route-currentFilter="@ViewData["CurrentFilter"]"
+                   class="page-link">@i</a>
+            </li>
+        }
+        <li>
+            <a asp-action="Index"
+               asp-route-pageNumber="@(Model.PageIndex + 1)"
+               asp-route-currentFilter="@ViewData["CurrentFilter"]"
+               class="btn btn-light @nextDisabled">
+                >>
+            </a>
+        </li>
+    </ul>
+</div>
+

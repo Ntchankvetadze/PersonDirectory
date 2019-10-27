@@ -1,0 +1,248 @@
+﻿@using PersonsDirectoryApp.Data.Models
+@model PersonsDirectoryApp.Web.ViewModels.PersonViewModel
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Edit</h1>
+
+<h4>Person</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form enctype="multipart/form-data" asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="ImageUrl" />
+
+            <div class="form-group">
+                <label asp-for="FirstName" class="control-label"></label>
+                <input asp-for="FirstName" class="form-control" />
+                <span asp-validation-for="FirstName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="LastName" class="control-label"></label>
+                <input asp-for="LastName" class="form-control" />
+                <span asp-validation-for="LastName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Gender" class="control-label"></label>
+                <select asp-for="Gender" class="form-control" asp-items="Html.GetEnumSelectList<Enums.Gender>()"></select>
+                <span asp-validation-for="Gender" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PersonalNo" class="control-label"></label>
+                <input asp-for="PersonalNo" class="form-control" />
+                <span asp-validation-for="PersonalNo" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="BirthDate" class="control-label"></label>
+                @Html.TextBoxFor(model => model.BirthDate, "{0:dd/MM/yyyy}", new { @class = "form-control datepicker", placeholder = "DD/MM/YYYY", maxlength = "100" })
+                <span asp-validation-for="BirthDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CityId" class="control-label"></label>
+                <select asp-for="CityId" asp-items="ViewBag.Cities" class="form-control"></select>
+            </div>
+            <div class="form-group">
+                
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Photo" class="control-label"></label>
+                <div class="custom-file">
+                    <input asp-for="Photo" class="form-control custom-file-input" />
+                    <label class="custom-file-label">Choose Photo...</label>
+                </div>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+    <div class="col-md-4">
+        <h5> Telephone Numbers</h5>
+        <table class="table table-light table-responsive-sm" id="editTelephoneNumbersTable">
+            <thead>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <select id="newTelephoneType" class="custom-select" asp-items="Html.GetEnumSelectList<Enums.TelephoneType>()">
+                        </select>
+                    </td>
+                    <td>
+                        <input id="newTelephoneNumber" type="text" class="form-control" />
+                        <span id="telephoneNumberValidation" class="text-danger"></span>
+                    </td>
+                    <td id="addTelephoneNubmerBtn"><a class="btn btn-success">Add</a></td>
+                </tr>    
+                @foreach (var item in ViewBag.TelephoneNumbers)
+                {
+                    <tr data-id="@item.Id">
+                        <td>@item.TelephoneType</td>
+                        <td>@item.Number</td>
+                        <td class="remove-telephone-nubmer-btn"><a class="btn btn-danger">Remove</a></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <div class="col-md-4">
+        <h5> Relations </h5>
+
+        <table class="table table-light table-responsive-sm" id="editPersonRelationMapsTable">
+            <thead>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <select id="newRelationType" class="custom-select" asp-items="Html.GetEnumSelectList<Enums.RelationType>()">
+                        </select>
+                    </td>
+                    <td>
+                        <input id="newRelationMapPersonalNo" type="text" class="form-control" />
+                        <span id="personalNoValidation" class="text-danger"></span>
+                    </td>
+                    <td id="addRelationMapBtn"><a class="btn btn-success">Add</a></td>
+                </tr>
+                @foreach (var item in ViewBag.PersonRelationMaps)
+                {
+                    bool isFirst = @item.PersonOneId.Equals(Model.Id);
+                    int relativeId = isFirst ? @item.PersonTwoId : @item.PersonOneId;
+                    <tr data-id="@item.Id">
+                        <td>@item.RelationType</td>
+                        <td>@(isFirst ? @item.PersonTwo.PersonalNo : @item.PersonOne.PersonalNo)</td>
+                        <td class="remove-relation-btn"><a class="btn btn-danger">Remove</a></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    <script>
+        $(document).ready(function () {
+
+            $(document).on('click', '#editPersonRelationMapsTable .remove-relation-btn', function (e) {
+                e.preventDefault();
+
+                var relation = $(this).closest('tr');
+                var relationId = relation.data('id');
+
+                $.ajax({
+                    method: "POST",
+                    url: '@Url.Action("DeleteRelationMap", "Person")',
+                    data: "&id=" + relationId,
+                    success: (function (response) {
+                        if (response.success) {
+                            relation.remove();
+                        }
+                        else {
+                            alert(response.message);
+                        }
+                    })
+                });
+            });
+
+            $(document).on('click', '#editTelephoneNumbersTable .remove-telephone-nubmer-btn', function (e) {
+                e.preventDefault();
+
+                var telNumber = $(this).closest('tr');
+                var telNumberId = telNumber.data('id');
+
+                $.ajax({
+                    method: "POST",
+                    url: '@Url.Action("DeleteTelephoneNumber", "Person")',
+                    data: "&id=" + telNumberId,
+                    success: (function (response) {
+                        if (response.success) {
+                            telNumber.remove();
+                        }
+                        else {
+                            alert(response.message);
+                        }
+                    })
+                });
+            });
+
+            $('#addTelephoneNubmerBtn').on("click", function (e) {
+                e.preventDefault();
+
+                var telNumber = $('#newTelephoneNumber').val();
+                var telType = $('#newTelephoneType option:selected').text();
+                
+                var personId = '@Model.Id';
+                $.ajax({
+                    method: "POST",
+                    url: '@Url.Action("AddTelephoneNumber", "Person")',
+                    data: "&PersonId=" + personId
+                        + "&TelephoneType=" + telType
+                        + "&Number=" + telNumber,
+                    success: (function (response) {
+                        if (response.success) {
+                            var newRow = `<tr data-id="${response.newId}">
+                                            <td>${telType}</td>
+                                            <td>${telNumber}</td>
+                                            <td class="remove-telephone-nubmer-btn"><a class="btn btn-danger">Remove</a></td>
+                                        </tr>`;
+
+                            $('#editTelephoneNumbersTable').append(newRow);
+
+                            $('#newTelephoneNumber').val('');
+                            $('#newTelephoneType').val(0);
+                            $('#telephoneNumberValidation').html('');
+                        }
+                        else {
+                            $('#telephoneNumberValidation').html(response.message);
+                        }
+                    })
+                });
+            });
+
+            $('#addRelationMapBtn').on("click", function (e) {
+                e.preventDefault();
+
+                var personalNo = $('#newRelationMapPersonalNo').val();
+                var relationType = $('#newRelationType option:selected').text();
+                
+                var personId = '@Model.Id';
+                $.ajax({
+                    method: "POST",
+                    url: '@Url.Action("AddRelationMap", "Person")',
+                    data: "&PersonOneId=" + personId
+                        + "&RelationType=" + relationType
+                        + "&NewRelativePersonalNo=" + personalNo,
+                    success: (function (response) {
+                        if (response.success) {
+                            var newRow = `<tr data-id="${response.newId}">
+                                            <td>${relationType}</td>
+                                            <td>${personalNo}</td>
+                                            <td class="remove-relation-btn"><a class="btn btn-danger">Remove</a></td>
+                                        </tr>`;
+
+                            $('#editPersonRelationMapsTable').append(newRow);
+
+                            $('#newRelationMapPersonalNo').val('');
+                            $('#newRelationType').val(0);
+                            $('#personalNoValidation').html('');
+                        }
+                        else {
+                            $('#personalNoValidation').html(response.message);
+                        }
+                    })
+                });
+            });
+
+        });
+    </script>
+}

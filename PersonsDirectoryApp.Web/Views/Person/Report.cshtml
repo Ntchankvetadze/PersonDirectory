@@ -1,0 +1,62 @@
+﻿@model IEnumerable<PersonsDirectoryApp.Web.ViewModels.ReportViewModel>
+
+@{
+    ViewData["Title"] = "Report";
+}
+
+<h1>Relations Report</h1>
+
+<table class="table table-info">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.PersonId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FullName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PersonalNo)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.RelativeCount)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ColleagueCount)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.AcquaintanceCount)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.OtherCount)
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.PersonId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.FullName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.PersonalNo)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.RelativeCount)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ColleagueCount)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.AcquaintanceCount)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.OtherCount)
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
